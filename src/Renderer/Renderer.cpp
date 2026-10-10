@@ -84,6 +84,12 @@ void Renderer::Initialize() {
         throw std::runtime_error("Failed to create RTV descriptor heap.");
     }
 
+    if (FAILED(m_device->CreateFence(m_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)))) {
+        throw std::runtime_error("Failed to create fence.");
+    }
+
+    m_camera = std::make_unique<Camera2D>(static_cast<float>(m_width), static_cast<float>(m_height));
+
     m_initialized = true;
 #else
     (void)m_window;
@@ -95,17 +101,23 @@ void Renderer::Resize(int width, int height) {
     m_width = width;
     m_height = height;
 
-    if (m_swapChain != nullptr) {
-        // Resize logic will be implemented when the frame graph and back buffers are fully managed.
+    if (m_camera != nullptr) {
+        m_camera->SetSize(static_cast<float>(m_width), static_cast<float>(m_height));
     }
+
+    if (m_swapChain != nullptr) {
+        // Resize logic will be implemented when back buffer management is complete.
+    }
+}
+
+void Renderer::Clear(float r, float g, float b, float a) {
+    // Clear implementation will be added with command list recording.
 }
 
 void Renderer::BeginFrame() {
     if (!m_initialized) {
         return;
     }
-
-    // Frame start hook. This module will grow into the render graph, clear pass, and command list recording.
 }
 
 void Renderer::EndFrame() {
@@ -114,6 +126,14 @@ void Renderer::EndFrame() {
     }
 
     m_swapChain->Present(1, 0);
+}
+
+void Renderer::DrawSprite(const Sprite& sprite) {
+    // Sprite rendering will be implemented in the sprite batch renderer.
+}
+
+void Renderer::DrawRectangle(float x, float y, float width, float height, const glm::vec4& color) {
+    // Rectangle drawing will be implemented in the shape renderer.
 }
 
 } // namespace sclpr::renderer

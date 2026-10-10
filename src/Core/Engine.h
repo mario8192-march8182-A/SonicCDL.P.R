@@ -1,6 +1,25 @@
 #pragma once
 
+#include <memory>
 #include <string>
+
+namespace sclpr::core {
+
+class Window;
+
+} // namespace sclpr::core
+
+namespace sclpr::renderer {
+
+class Renderer;
+
+} // namespace sclpr::renderer
+
+namespace sclpr::game {
+
+class SceneManager;
+
+} // namespace sclpr::game
 
 namespace sclpr::core {
 
@@ -22,6 +41,7 @@ private:
 
     std::unique_ptr<Window> m_window;
     std::unique_ptr<sclpr::renderer::Renderer> m_renderer;
+    std::unique_ptr<sclpr::game::SceneManager> m_sceneManager;
 
     bool m_running{false};
     std::string m_title{"Sonic CD: Little Planet Revisited"};
