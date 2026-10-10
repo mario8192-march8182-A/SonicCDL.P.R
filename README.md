@@ -1,6 +1,6 @@
 # Sonic CD: Little Planet Revisited
 
-> **Note on Repository Name**: The repository is named "SonicCDL.P.R" but the project is officially called **"Sonic CD: Little Planet Revisited"** (note the double 'L' in "Little"). The repository name was created with a spelling error that couldn't be corrected after creation.
+> **Note on Repository Name**: The repository is named "SonicCDL.P.R" but the project is officially called **"Sonic CD: Little Planet Revisited"** (note the double 'L' in "Little"). The repository name was created with a spelling error that couldn't be corrected after creation. (THIS SPELLING ERROR HAS ALREADY BEEN CORRECTED)
 
 A modern game engine inspired by the Oxygen Engine (Sonic 3 A.I.R.), written from scratch in C++20 using DirectX 12 and SDL3.
 
