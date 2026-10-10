@@ -1,10 +1,6 @@
 #pragma once
 
-#include <memory>
 #include <string>
-
-#include "Core/Platform/Window.h"
-#include "Renderer/Renderer.h"
 
 namespace sclpr::core {
 

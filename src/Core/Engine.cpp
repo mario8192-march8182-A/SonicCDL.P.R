@@ -23,10 +23,6 @@ int Engine::Run() {
 }
 
 void Engine::Initialize() {
-    // The engine boot order is intentionally staged:
-    // 1. Platform/window creation
-    // 2. Renderer initialization using the native SDL window handle
-    // 3. Gameplay loop start
     m_window = std::make_unique<Window>(m_title, m_width, m_height);
     m_window->Show();
 
