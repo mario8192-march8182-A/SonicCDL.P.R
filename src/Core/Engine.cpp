@@ -1,8 +1,5 @@
 #include "Core/Engine.h"
 
-#include "Core/Platform/Window.h"
-#include "Renderer/Renderer.h"
-
 #include <memory>
 
 namespace sclpr::core {
@@ -26,23 +23,36 @@ int Engine::Run() {
 }
 
 void Engine::Initialize() {
-    // The engine is initialized in a staged way:
-    // 1. SDL window setup
-    // 2. DirectX 12 rendering context
-    // 3. game loop start
-    // This keeps platform init separate from gameplay logic.
-    m_running = true;
+    // The engine boot order is intentionally staged:
+    // 1. Platform/window creation
+    // 2. Renderer initialization using the native SDL window handle
+    // 3. Gameplay loop start
+    m_window = std::make_unique<Window>(m_title, m_width, m_height);
+    m_window->Show();
+
+    m_renderer = std::make_unique<sclpr::renderer::Renderer>(m_window->GetNativeHandle());
+    m_renderer->Initialize();
+
+    m_running = m_window->IsOpen();
 }
 
 void Engine::Update() {
-    // Placeholder update phase. The gameplay loop will be added here later.
+    if (m_window != nullptr) {
+        m_window->PollEvents();
+        m_running = m_window->IsOpen();
+    }
 }
 
 void Engine::Render() {
-    // Placeholder render phase. Rendering will be handled by the Renderer subsystem.
+    if (m_renderer != nullptr) {
+        m_renderer->BeginFrame();
+        m_renderer->EndFrame();
+    }
 }
 
 void Engine::Shutdown() {
+    m_renderer.reset();
+    m_window.reset();
     m_running = false;
 }
 

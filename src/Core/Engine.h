@@ -1,6 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <string>
+
+#include "Core/Platform/Window.h"
+#include "Renderer/Renderer.h"
 
 namespace sclpr::core {
 
@@ -19,6 +23,9 @@ private:
     void Update();
     void Render();
     void Shutdown();
+
+    std::unique_ptr<Window> m_window;
+    std::unique_ptr<sclpr::renderer::Renderer> m_renderer;
 
     bool m_running{false};
     std::string m_title{"Sonic CD: Little Planet Revisited"};
