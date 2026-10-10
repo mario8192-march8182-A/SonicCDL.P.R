@@ -1,0 +1,13 @@
+# This file is intentionally ignored by Git because build outputs and local caches should not be committed.
+# Generated binary artifacts and editor caches belong in the build directory.
+
+build/
+.vs/
+out/
+cmake-build-debug/
+cmake-build-release/
+CMakeFiles/
+*.user
+*.suo
+*.vcxproj.filters
+*.vcxproj.user
