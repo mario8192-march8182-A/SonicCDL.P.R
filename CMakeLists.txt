@@ -22,6 +22,8 @@ add_executable(SonicCDLPR
     src/Game/TitleScene.cpp
     src/Game/SceneManager.cpp
     src/ResourceManager/RomLoader.cpp
+    src/ResourceManager/RomExtractor.cpp
+    src/ResourceManager/PaletteManager.cpp
     src/ResourceManager/ResourceManager.cpp
 )
 
@@ -70,6 +72,10 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Game/SceneManager.cpp
     src/ResourceManager/RomLoader.h
     src/ResourceManager/RomLoader.cpp
+    src/ResourceManager/RomExtractor.h
+    src/ResourceManager/RomExtractor.cpp
+    src/ResourceManager/PaletteManager.h
+    src/ResourceManager/PaletteManager.cpp
     src/ResourceManager/ResourceManager.h
     src/ResourceManager/ResourceManager.cpp
 )
