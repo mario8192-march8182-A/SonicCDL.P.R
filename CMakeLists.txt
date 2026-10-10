@@ -13,7 +13,16 @@ add_executable(SonicCDLPR
     src/main.cpp
     src/Core/Engine.cpp
     src/Core/Platform/Window.cpp
+    src/Core/Timer.cpp
     src/Renderer/Renderer.cpp
+    src/Renderer/Camera2D.cpp
+    src/Renderer/Texture2D.cpp
+    src/Game/Scene.cpp
+    src/Game/BootScene.cpp
+    src/Game/TitleScene.cpp
+    src/Game/SceneManager.cpp
+    src/ResourceManager/RomLoader.cpp
+    src/ResourceManager/ResourceManager.cpp
 )
 
 target_include_directories(SonicCDLPR
@@ -24,12 +33,13 @@ target_include_directories(SonicCDLPR
 find_package(SDL3 CONFIG REQUIRED)
 target_link_libraries(SonicCDLPR PRIVATE SDL3::SDL3)
 
+find_package(glm CONFIG REQUIRED)
+target_link_libraries(SonicCDLPR PRIVATE glm::glm)
+
 if(WIN32)
     target_link_libraries(SonicCDLPR PRIVATE d3d12 dxgi dxguid)
 endif()
 
-# Future module structure hook points.
-# The project is intentionally organized in a way that each subsystem can grow independently.
 if(SCLPR_BUILD_TOOLS)
     message(STATUS "Editor/debug tools enabled.")
 endif()
@@ -40,6 +50,26 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Core/Engine.cpp
     src/Core/Platform/Window.h
     src/Core/Platform/Window.cpp
+    src/Core/Timer.h
+    src/Core/Timer.cpp
     src/Renderer/Renderer.h
     src/Renderer/Renderer.cpp
+    src/Renderer/Camera2D.h
+    src/Renderer/Camera2D.cpp
+    src/Renderer/Texture2D.h
+    src/Renderer/Texture2D.cpp
+    src/Renderer/Sprite.h
+    src/Game/GameState.h
+    src/Game/Scene.h
+    src/Game/Scene.cpp
+    src/Game/BootScene.h
+    src/Game/BootScene.cpp
+    src/Game/TitleScene.h
+    src/Game/TitleScene.cpp
+    src/Game/SceneManager.h
+    src/Game/SceneManager.cpp
+    src/ResourceManager/RomLoader.h
+    src/ResourceManager/RomLoader.cpp
+    src/ResourceManager/ResourceManager.h
+    src/ResourceManager/ResourceManager.cpp
 )

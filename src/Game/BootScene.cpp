@@ -1,16 +1,19 @@
 #include "Game/BootScene.h"
+#include "ResourceManager/ResourceManager.h"
 
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace sclpr::scene {
 
-BootScene::BootScene() : Scene() {}
+BootScene::BootScene() : Scene(), m_romLoader(nullptr) {}
 
 void BootScene::Initialize(sclpr::renderer::Renderer* renderer) {
     // Initialize boot screen resources
     m_phase = BootPhase::SEGA;
     m_phaseTimer = 0.0f;
     m_textAlpha = 0.0f;
+    m_romLoadingProgress = 0.0f;
 }
 
 void BootScene::Update(float deltaTime) {
@@ -44,16 +47,14 @@ void BootScene::Update(float deltaTime) {
                 m_phase = BootPhase::ROMLoading;
                 m_phaseTimer = 0.0f;
                 m_textAlpha = 0.0f;
+                StartRomLoading();
             }
             break;
 
         case BootPhase::ROMLoading:
             // ROM loading screen with progress indicator
             m_textAlpha = 1.0f;
-            if (m_phaseTimer > 2.0f) {  // Simulate ROM loading
-                m_phase = BootPhase::Complete;
-                m_phaseTimer = 0.0f;
-            }
+            UpdateRomLoading(deltaTime);
             break;
 
         case BootPhase::Complete:
@@ -67,6 +68,51 @@ void BootScene::Update(float deltaTime) {
     }
 }
 
+void BootScene::StartRomLoading() {
+    if (m_romLoader == nullptr) {
+        // Create resource manager and rom loader
+        m_resourceManager = std::make_unique<sclpr::resource::ResourceManager>();
+        m_resourceManager->Initialize();
+        m_romLoader = m_resourceManager->GetRomLoader();
+    }
+
+    // Detect available ROMs
+    auto detectedRoms = m_romLoader->DetectRoms();
+
+    if (!detectedRoms.empty()) {
+        // Load the first valid ROM found
+        // In a real implementation, this would show a ROM selection menu
+        m_selectedRomPath = detectedRoms[0].filename;
+        m_romLoadingActive = true;
+    } else {
+        // No ROM found - show error and proceed anyway (for testing)
+        m_romLoadingActive = false;
+        m_phase = BootPhase::Complete;
+    }
+}
+
+void BootScene::UpdateRomLoading(float deltaTime) {
+    if (!m_romLoadingActive) {
+        m_phase = BootPhase::Complete;
+        return;
+    }
+
+    // Simulate ROM loading progress over 2 seconds
+    float loadDuration = 2.0f;
+    m_romLoadingProgress = std::min(1.0f, m_phaseTimer / loadDuration);
+
+    // Attempt to load ROM when progress reaches 100%
+    if (m_romLoadingProgress >= 1.0f) {
+        if (m_romLoader->LoadRom(m_selectedRomPath)) {
+            // ROM loaded successfully
+            m_romLoadedSuccessfully = true;
+        }
+        m_romLoadingActive = false;
+        m_phaseTimer = 0.0f;
+        m_phase = BootPhase::Complete;
+    }
+}
+
 void BootScene::Render(sclpr::renderer::Renderer* renderer) {
     // Clear the screen to black
     renderer->Clear(0.0f, 0.0f, 0.0f, 1.0f);
@@ -74,7 +120,6 @@ void BootScene::Render(sclpr::renderer::Renderer* renderer) {
     switch (m_phase) {
         case BootPhase::SEGA:
             // Render "Original Game By SEGA" text
-            // This is a placeholder. Actual text rendering will use SDL_ttf or a font texture.
             renderer->DrawRectangle(640.0f - 200.0f, 360.0f - 50.0f, 400.0f, 100.0f,
                                    glm::vec4(1.0f, 1.0f, 1.0f, m_textAlpha));
             break;
@@ -89,10 +134,12 @@ void BootScene::Render(sclpr::renderer::Renderer* renderer) {
             // Render ROM loading screen
             renderer->DrawRectangle(640.0f - 300.0f, 360.0f - 100.0f, 600.0f, 200.0f,
                                    glm::vec4(0.2f, 0.2f, 0.3f, 1.0f));
-            // Loading bar (simulated)
-            float loadProgress = m_phaseTimer / 2.0f;
-            renderer->DrawRectangle(640.0f - 250.0f, 360.0f + 50.0f, 500.0f * loadProgress, 20.0f,
+            // Loading bar (progress)
+            renderer->DrawRectangle(640.0f - 250.0f, 360.0f + 50.0f, 500.0f * m_romLoadingProgress, 20.0f,
                                    glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+            // Loading bar background
+            renderer->DrawRectangle(640.0f - 250.0f, 360.0f + 50.0f, 500.0f, 20.0f,
+                                   glm::vec4(0.3f, 0.3f, 0.3f, 0.5f));
             break;
 
         case BootPhase::Complete:
