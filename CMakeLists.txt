@@ -25,6 +25,7 @@ add_executable(SonicCDLPR
     src/Game/PlayerStateMachine.cpp
     src/Game/GemstoneSonicController.cpp
     src/Game/PlayerCollisionController.cpp
+    src/Game/PlayerMovementSystem.cpp
     src/ResourceManager/RomLoader.cpp
     src/ResourceManager/RomExtractor.cpp
     src/ResourceManager/RomAssetCatalog.cpp
@@ -36,6 +37,9 @@ add_executable(SonicCDLPR
     src/Physics/PhysicsWorld.cpp
     src/Physics/JumpPhysics.cpp
     src/Physics/WaterPhysics.cpp
+    src/Physics/SlopePhysics.cpp
+    src/Physics/RollingPhysics.cpp
+    src/Physics/SpindashPhysics.cpp
     src/Collision/Sensor.cpp
     src/Collision/FloorSensor.cpp
     src/Collision/CeilingSensor.cpp
@@ -99,6 +103,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Game/GemstoneSonicController.cpp
     src/Game/PlayerCollisionController.h
     src/Game/PlayerCollisionController.cpp
+    src/Game/PlayerMovementSystem.h
+    src/Game/PlayerMovementSystem.cpp
     src/ResourceManager/RomLoader.h
     src/ResourceManager/RomLoader.cpp
     src/ResourceManager/RomExtractor.h
@@ -121,6 +127,12 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Physics/JumpPhysics.cpp
     src/Physics/WaterPhysics.h
     src/Physics/WaterPhysics.cpp
+    src/Physics/SlopePhysics.h
+    src/Physics/SlopePhysics.cpp
+    src/Physics/RollingPhysics.h
+    src/Physics/RollingPhysics.cpp
+    src/Physics/SpindashPhysics.h
+    src/Physics/SpindashPhysics.cpp
     src/Collision/Sensor.h
     src/Collision/Sensor.cpp
     src/Collision/FloorSensor.h
