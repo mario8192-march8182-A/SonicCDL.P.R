@@ -23,12 +23,15 @@ add_executable(SonicCDLPR
     src/Game/SceneManager.cpp
     src/ResourceManager/RomLoader.cpp
     src/ResourceManager/RomExtractor.cpp
+    src/ResourceManager/RomAssetCatalog.cpp
     src/ResourceManager/PaletteManager.cpp
     src/ResourceManager/ResourceManager.cpp
     src/Physics/PhysicsBody.cpp
     src/Physics/GroundPhysics.cpp
     src/Physics/AirPhysics.cpp
     src/Physics/PhysicsWorld.cpp
+    src/Physics/JumpPhysics.cpp
+    src/Physics/WaterPhysics.cpp
 )
 
 target_include_directories(SonicCDLPR
@@ -78,6 +81,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/ResourceManager/RomLoader.cpp
     src/ResourceManager/RomExtractor.h
     src/ResourceManager/RomExtractor.cpp
+    src/ResourceManager/RomAssetCatalog.h
+    src/ResourceManager/RomAssetCatalog.cpp
     src/ResourceManager/PaletteManager.h
     src/ResourceManager/PaletteManager.cpp
     src/ResourceManager/ResourceManager.h
@@ -90,4 +95,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Physics/AirPhysics.cpp
     src/Physics/PhysicsWorld.h
     src/Physics/PhysicsWorld.cpp
+    src/Physics/JumpPhysics.h
+    src/Physics/JumpPhysics.cpp
+    src/Physics/WaterPhysics.h
+    src/Physics/WaterPhysics.cpp
 )
