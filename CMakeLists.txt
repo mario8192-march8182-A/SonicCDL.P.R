@@ -35,6 +35,11 @@ add_executable(SonicCDLPR
     src/Physics/PhysicsWorld.cpp
     src/Physics/JumpPhysics.cpp
     src/Physics/WaterPhysics.cpp
+    src/Collision/Sensor.cpp
+    src/Collision/FloorSensor.cpp
+    src/Collision/CeilingSensor.cpp
+    src/Collision/WallSensor.cpp
+    src/Collision/SensorManager.cpp
     src/Mod/ModLoader.cpp
 )
 
@@ -112,6 +117,16 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Physics/JumpPhysics.cpp
     src/Physics/WaterPhysics.h
     src/Physics/WaterPhysics.cpp
+    src/Collision/Sensor.h
+    src/Collision/Sensor.cpp
+    src/Collision/FloorSensor.h
+    src/Collision/FloorSensor.cpp
+    src/Collision/CeilingSensor.h
+    src/Collision/CeilingSensor.cpp
+    src/Collision/WallSensor.h
+    src/Collision/WallSensor.cpp
+    src/Collision/SensorManager.h
+    src/Collision/SensorManager.cpp
     src/Mod/ModLoader.h
     src/Mod/ModLoader.cpp
 )
