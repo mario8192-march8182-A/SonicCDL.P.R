@@ -40,6 +40,7 @@ add_executable(SonicCDLPR
     src/Collision/CeilingSensor.cpp
     src/Collision/WallSensor.cpp
     src/Collision/SensorManager.cpp
+    src/Collision/CollisionResolver.cpp
     src/Mod/ModLoader.cpp
 )
 
@@ -127,6 +128,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Collision/WallSensor.cpp
     src/Collision/SensorManager.h
     src/Collision/SensorManager.cpp
+    src/Collision/CollisionResolver.h
+    src/Collision/CollisionResolver.cpp
     src/Mod/ModLoader.h
     src/Mod/ModLoader.cpp
 )
