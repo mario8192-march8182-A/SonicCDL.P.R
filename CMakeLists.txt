@@ -21,6 +21,7 @@ add_executable(SonicCDLPR
     src/Game/BootScene.cpp
     src/Game/TitleScene.cpp
     src/Game/SceneManager.cpp
+    src/Game/PlayerController.cpp
     src/ResourceManager/RomLoader.cpp
     src/ResourceManager/RomExtractor.cpp
     src/ResourceManager/RomAssetCatalog.cpp
@@ -32,6 +33,7 @@ add_executable(SonicCDLPR
     src/Physics/PhysicsWorld.cpp
     src/Physics/JumpPhysics.cpp
     src/Physics/WaterPhysics.cpp
+    src/Mod/ModLoader.cpp
 )
 
 target_include_directories(SonicCDLPR
@@ -44,6 +46,9 @@ target_link_libraries(SonicCDLPR PRIVATE SDL3::SDL3)
 
 find_package(glm CONFIG REQUIRED)
 target_link_libraries(SonicCDLPR PRIVATE glm::glm)
+
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries(SonicCDLPR PRIVATE nlohmann_json::nlohmann_json)
 
 if(WIN32)
     target_link_libraries(SonicCDLPR PRIVATE d3d12 dxgi dxguid)
@@ -77,6 +82,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Game/TitleScene.cpp
     src/Game/SceneManager.h
     src/Game/SceneManager.cpp
+    src/Game/PlayerController.h
+    src/Game/PlayerController.cpp
     src/ResourceManager/RomLoader.h
     src/ResourceManager/RomLoader.cpp
     src/ResourceManager/RomExtractor.h
@@ -99,4 +106,6 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Physics/JumpPhysics.cpp
     src/Physics/WaterPhysics.h
     src/Physics/WaterPhysics.cpp
+    src/Mod/ModLoader.h
+    src/Mod/ModLoader.cpp
 )
