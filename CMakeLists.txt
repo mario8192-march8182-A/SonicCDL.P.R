@@ -25,6 +25,10 @@ add_executable(SonicCDLPR
     src/ResourceManager/RomExtractor.cpp
     src/ResourceManager/PaletteManager.cpp
     src/ResourceManager/ResourceManager.cpp
+    src/Physics/PhysicsBody.cpp
+    src/Physics/GroundPhysics.cpp
+    src/Physics/AirPhysics.cpp
+    src/Physics/PhysicsWorld.cpp
 )
 
 target_include_directories(SonicCDLPR
@@ -78,4 +82,12 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/ResourceManager/PaletteManager.cpp
     src/ResourceManager/ResourceManager.h
     src/ResourceManager/ResourceManager.cpp
+    src/Physics/PhysicsBody.h
+    src/Physics/PhysicsBody.cpp
+    src/Physics/GroundPhysics.h
+    src/Physics/GroundPhysics.cpp
+    src/Physics/AirPhysics.h
+    src/Physics/AirPhysics.cpp
+    src/Physics/PhysicsWorld.h
+    src/Physics/PhysicsWorld.cpp
 )
