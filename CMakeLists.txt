@@ -27,6 +27,8 @@ add_executable(SonicCDLPR
     src/Game/PlayerCollisionController.cpp
     src/Game/PlayerMovementSystem.cpp
     src/ResourceManager/RomLoader.cpp
+    src/ResourceManager/RomBuildDetector.cpp
+    src/ResourceManager/RomBuildAdapter.cpp
     src/ResourceManager/RomExtractor.cpp
     src/ResourceManager/RomAssetCatalog.cpp
     src/ResourceManager/PaletteManager.cpp
@@ -107,6 +109,10 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Game/PlayerMovementSystem.cpp
     src/ResourceManager/RomLoader.h
     src/ResourceManager/RomLoader.cpp
+    src/ResourceManager/RomBuildDetector.h
+    src/ResourceManager/RomBuildDetector.cpp
+    src/ResourceManager/RomBuildAdapter.h
+    src/ResourceManager/RomBuildAdapter.cpp
     src/ResourceManager/RomExtractor.h
     src/ResourceManager/RomExtractor.cpp
     src/ResourceManager/RomAssetCatalog.h

@@ -1,10 +1,12 @@
 #include "ResourceManager/RomExtractor.h"
 
+#include "ResourceManager/RomBuildAdapter.h"
+
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
-#include <iomanip>
 #include <sstream>
-#include <string_view>
+#include <iomanip>
 
 namespace sclpr::resource {
 
@@ -63,7 +65,8 @@ std::vector<ExtractedChunk> RomExtractor::ExtractChunksBySignature(const std::ve
             continue;
         }
 
-        const std::string romLower = ToLower(std::string(reinterpret_cast<const char*>(m_romData.data()), std::min<size_t>(m_romData.size(), 4096)));
+        const std::string romLower = ToLower(std::string(reinterpret_cast<const char*>(m_romData.data()),
+            std::min<size_t>(m_romData.size(), 4096)));
         const std::size_t found = romLower.find(normalized);
         if (found == std::string::npos) {
             continue;
@@ -75,7 +78,7 @@ std::vector<ExtractedChunk> RomExtractor::ExtractChunksBySignature(const std::ve
         chunk.offset = found;
         chunk.size = std::min<size_t>(256, m_romData.size() - found);
         chunk.data.assign(m_romData.begin() + static_cast<std::ptrdiff_t>(found),
-                          m_romData.begin() + static_cast<std::ptrdiff_t>(found + chunk.size));
+            m_romData.begin() + static_cast<std::ptrdiff_t>(found + chunk.size));
         chunks.push_back(chunk);
     }
 
@@ -90,22 +93,18 @@ bool RomExtractor::ExtractPaletteTables(const std::filesystem::path& outputDirec
     std::filesystem::create_directories(outputDirectory);
 
     const std::vector<std::string> paletteSignatures = {
-        "palette",
-        "pal",
-        "title",
-        "font",
-        "art"
+        "palette", "pal", "title", "font", "art"
     };
 
     const auto chunks = ExtractChunksBySignature(paletteSignatures);
     if (chunks.empty()) {
-        // Fallback: dump the first 32 KB as a palette archive when no signature is found.
         std::filesystem::path fallback = outputDirectory / "palette_fallback.bin";
         std::ofstream out(fallback, std::ios::binary);
         if (!out.is_open()) {
             return false;
         }
-        out.write(reinterpret_cast<const char*>(m_romData.data()), std::streamsize(std::min<size_t>(32 * 1024, m_romData.size())));
+        out.write(reinterpret_cast<const char*>(m_romData.data()),
+            std::streamsize(std::min<size_t>(32 * 1024, m_romData.size())));
         out.close();
         return true;
     }
