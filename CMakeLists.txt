@@ -26,6 +26,8 @@ add_executable(SonicCDLPR
     src/Game/GemstoneSonicController.cpp
     src/Game/PlayerCollisionController.cpp
     src/Game/PlayerMovementSystem.cpp
+    src/Game/StageWorld.cpp
+    src/Game/ObjectData.cpp
     src/ResourceManager/RomLoader.cpp
     src/ResourceManager/RomBuildDetector.cpp
     src/ResourceManager/RomBuildAdapter.cpp
@@ -111,6 +113,10 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/Game/PlayerCollisionController.cpp
     src/Game/PlayerMovementSystem.h
     src/Game/PlayerMovementSystem.cpp
+    src/Game/StageWorld.h
+    src/Game/StageWorld.cpp
+    src/Game/ObjectData.h
+    src/Game/ObjectData.cpp
     src/ResourceManager/RomLoader.h
     src/ResourceManager/RomLoader.cpp
     src/ResourceManager/RomBuildDetector.h
