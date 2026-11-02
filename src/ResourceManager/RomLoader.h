@@ -7,12 +7,22 @@
 
 namespace sclpr::resource {
 
+enum class RomBuildVersion {
+    Unknown,
+    SonicCD_1993,
+    SonicCD_2011,
+    SonicCD_Prototype,
+    SonicCD_Classic
+};
+
 struct RomMetadata {
     std::string filename;
     std::string displayName;
     bool isValid{false};
     size_t fileSize{0};
     std::string region;  // "US", "JP", "EU"
+    RomBuildVersion buildVersion{RomBuildVersion::Unknown};
+    std::string buildName;
 };
 
 class RomLoader {
@@ -44,6 +54,7 @@ public:
 private:
     bool ValidateRom(const std::string& filePath, RomMetadata& outMetadata);
     bool ParseRomHeader(const std::vector<uint8_t>& headerData, RomMetadata& outMetadata);
+    void DetectBuildVersion(const std::vector<uint8_t>& romData, RomMetadata& outMetadata);
 
     RomMetadata m_currentRom;
     std::vector<uint8_t> m_romData;
