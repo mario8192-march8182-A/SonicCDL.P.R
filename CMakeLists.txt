@@ -31,6 +31,10 @@ add_executable(SonicCDLPR
     src/ResourceManager/RomBuildAdapter.cpp
     src/ResourceManager/RomExtractor.cpp
     src/ResourceManager/RomAssetCatalog.cpp
+    src/ResourceManager/AssetManifest.cpp
+    src/ResourceManager/LevelAssetLoader.cpp
+    src/ResourceManager/StageDataParser.cpp
+    src/ResourceManager/LevelDataIntegration.cpp
     src/ResourceManager/PaletteManager.cpp
     src/ResourceManager/ResourceManager.cpp
     src/Physics/PhysicsBody.cpp
@@ -117,6 +121,14 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/ResourceManager/RomExtractor.cpp
     src/ResourceManager/RomAssetCatalog.h
     src/ResourceManager/RomAssetCatalog.cpp
+    src/ResourceManager/AssetManifest.h
+    src/ResourceManager/AssetManifest.cpp
+    src/ResourceManager/LevelAssetLoader.h
+    src/ResourceManager/LevelAssetLoader.cpp
+    src/ResourceManager/StageDataParser.h
+    src/ResourceManager/StageDataParser.cpp
+    src/ResourceManager/LevelDataIntegration.h
+    src/ResourceManager/LevelDataIntegration.cpp
     src/ResourceManager/PaletteManager.h
     src/ResourceManager/PaletteManager.cpp
     src/ResourceManager/ResourceManager.h
