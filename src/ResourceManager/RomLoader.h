@@ -1,18 +1,18 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
-#include <vector>
-#include <memory>
 #include <unordered_map>
+#include <vector>
 
 namespace sclpr::resource {
 
-enum class RomBuildVersion {
-    Unknown,
-    SonicCD_1993,
-    SonicCD_2011,
-    SonicCD_Prototype,
-    SonicCD_Classic
+struct RomResource {
+    std::string name;
+    std::string type;
+    size_t offset{0};
+    size_t size{0};
 };
 
 struct RomMetadata {
@@ -20,9 +20,7 @@ struct RomMetadata {
     std::string displayName;
     bool isValid{false};
     size_t fileSize{0};
-    std::string region;  // "US", "JP", "EU"
-    RomBuildVersion buildVersion{RomBuildVersion::Unknown};
-    std::string buildName;
+    std::string region;
 };
 
 class RomLoader {
@@ -33,32 +31,24 @@ public:
     RomLoader(const RomLoader&) = delete;
     RomLoader& operator=(const RomLoader&) = delete;
 
-    // Detect and validate ROM files in the current directory and standard locations
     std::vector<RomMetadata> DetectRoms();
-
-    // Load a specific ROM/disk image
     bool LoadRom(const std::string& filePath);
-
-    // Get the current loaded ROM metadata
     const RomMetadata* GetLoadedRomMetadata() const noexcept;
-
-    // Check if a ROM is currently loaded
     bool IsRomLoaded() const noexcept;
 
-    // Extract a file from the ROM by name
     std::vector<uint8_t> ExtractResource(const std::string& resourceName);
-
-    // Get list of available resources in the loaded ROM
     std::vector<std::string> GetAvailableResources() const;
+    std::vector<RomResource> GetKnownResources() const noexcept;
 
 private:
     bool ValidateRom(const std::string& filePath, RomMetadata& outMetadata);
     bool ParseRomHeader(const std::vector<uint8_t>& headerData, RomMetadata& outMetadata);
-    void DetectBuildVersion(const std::vector<uint8_t>& romData, RomMetadata& outMetadata);
+    void BuildKnownResourceIndex();
 
     RomMetadata m_currentRom;
     std::vector<uint8_t> m_romData;
-    std::unordered_map<std::string, size_t> m_resourceOffsets;  // Resource name -> offset in ROM
+    std::unordered_map<std::string, size_t> m_resourceOffsets;
+    std::vector<RomResource> m_knownResources;
     bool m_romLoaded{false};
 };
 
