@@ -6,21 +6,30 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+
+    env:
+      VCPKG_DEFAULT_TRIPLET: x64-windows
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install CMake and build deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build pkg-config
+      - name: Install dependencies with vcpkg
+        shell: pwsh
+        run: vcpkg install --triplet $env:VCPKG_DEFAULT_TRIPLET
 
-      - name: Configure with CMake
-        run: cmake -S . -B build -G Ninja
+      - name: Configure CMake
+        shell: pwsh
+        run: >-
+          cmake -S . -B build -A x64
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          -DVCPKG_TARGET_TRIPLET=$env:VCPKG_DEFAULT_TRIPLET
 
       - name: Build
-        run: cmake --build build --parallel
+        run: cmake --build build --config Release --parallel
