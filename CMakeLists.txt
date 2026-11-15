@@ -37,6 +37,7 @@ add_executable(SonicCDLPR
     src/ResourceManager/LevelAssetLoader.cpp
     src/ResourceManager/StageDataParser.cpp
     src/ResourceManager/LevelDataIntegration.cpp
+    src/ResourceManager/AddOnRomManager.cpp
     src/ResourceManager/PaletteManager.cpp
     src/ResourceManager/ResourceManager.cpp
     src/Physics/PhysicsBody.cpp
@@ -57,10 +58,7 @@ add_executable(SonicCDLPR
     src/Mod/ModLoader.cpp
 )
 
-target_include_directories(SonicCDLPR
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+target_include_directories(SonicCDLPR PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 find_package(SDL3 CONFIG REQUIRED)
 target_link_libraries(SonicCDLPR PRIVATE SDL3::SDL3)
@@ -81,94 +79,51 @@ endif()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     src/main.cpp
-    src/Core/Engine.h
-    src/Core/Engine.cpp
-    src/Core/Platform/Window.h
-    src/Core/Platform/Window.cpp
-    src/Core/Timer.h
-    src/Core/Timer.cpp
-    src/Renderer/Renderer.h
-    src/Renderer/Renderer.cpp
-    src/Renderer/Camera2D.h
-    src/Renderer/Camera2D.cpp
-    src/Renderer/Texture2D.h
-    src/Renderer/Texture2D.cpp
+    src/Core/Engine.h src/Core/Engine.cpp
+    src/Core/Platform/Window.h src/Core/Platform/Window.cpp
+    src/Core/Timer.h src/Core/Timer.cpp
+    src/Renderer/Renderer.h src/Renderer/Renderer.cpp
+    src/Renderer/Camera2D.h src/Renderer/Camera2D.cpp
+    src/Renderer/Texture2D.h src/Renderer/Texture2D.cpp
     src/Renderer/Sprite.h
     src/Game/GameState.h
-    src/Game/Scene.h
-    src/Game/Scene.cpp
-    src/Game/BootScene.h
-    src/Game/BootScene.cpp
-    src/Game/TitleScene.h
-    src/Game/TitleScene.cpp
-    src/Game/SceneManager.h
-    src/Game/SceneManager.cpp
-    src/Game/PlayerController.h
-    src/Game/PlayerController.cpp
-    src/Game/PlayerStateMachine.h
-    src/Game/PlayerStateMachine.cpp
-    src/Game/GemstoneSonicController.h
-    src/Game/GemstoneSonicController.cpp
-    src/Game/PlayerCollisionController.h
-    src/Game/PlayerCollisionController.cpp
-    src/Game/PlayerMovementSystem.h
-    src/Game/PlayerMovementSystem.cpp
-    src/Game/StageWorld.h
-    src/Game/StageWorld.cpp
-    src/Game/ObjectData.h
-    src/Game/ObjectData.cpp
-    src/ResourceManager/RomLoader.h
-    src/ResourceManager/RomLoader.cpp
-    src/ResourceManager/RomBuildDetector.h
-    src/ResourceManager/RomBuildDetector.cpp
-    src/ResourceManager/RomBuildAdapter.h
-    src/ResourceManager/RomBuildAdapter.cpp
-    src/ResourceManager/RomExtractor.h
-    src/ResourceManager/RomExtractor.cpp
-    src/ResourceManager/RomAssetCatalog.h
-    src/ResourceManager/RomAssetCatalog.cpp
-    src/ResourceManager/AssetManifest.h
-    src/ResourceManager/AssetManifest.cpp
-    src/ResourceManager/LevelAssetLoader.h
-    src/ResourceManager/LevelAssetLoader.cpp
-    src/ResourceManager/StageDataParser.h
-    src/ResourceManager/StageDataParser.cpp
-    src/ResourceManager/LevelDataIntegration.h
-    src/ResourceManager/LevelDataIntegration.cpp
-    src/ResourceManager/PaletteManager.h
-    src/ResourceManager/PaletteManager.cpp
-    src/ResourceManager/ResourceManager.h
-    src/ResourceManager/ResourceManager.cpp
-    src/Physics/PhysicsBody.h
-    src/Physics/PhysicsBody.cpp
-    src/Physics/GroundPhysics.h
-    src/Physics/GroundPhysics.cpp
-    src/Physics/AirPhysics.h
-    src/Physics/AirPhysics.cpp
-    src/Physics/PhysicsWorld.h
-    src/Physics/PhysicsWorld.cpp
-    src/Physics/JumpPhysics.h
-    src/Physics/JumpPhysics.cpp
-    src/Physics/WaterPhysics.h
-    src/Physics/WaterPhysics.cpp
-    src/Physics/SlopePhysics.h
-    src/Physics/SlopePhysics.cpp
-    src/Physics/RollingPhysics.h
-    src/Physics/RollingPhysics.cpp
-    src/Physics/SpindashPhysics.h
-    src/Physics/SpindashPhysics.cpp
-    src/Collision/Sensor.h
-    src/Collision/Sensor.cpp
-    src/Collision/FloorSensor.h
-    src/Collision/FloorSensor.cpp
-    src/Collision/CeilingSensor.h
-    src/Collision/CeilingSensor.cpp
-    src/Collision/WallSensor.h
-    src/Collision/WallSensor.cpp
-    src/Collision/SensorManager.h
-    src/Collision/SensorManager.cpp
-    src/Collision/CollisionResolver.h
-    src/Collision/CollisionResolver.cpp
-    src/Mod/ModLoader.h
-    src/Mod/ModLoader.cpp
+    src/Game/Scene.h src/Game/Scene.cpp
+    src/Game/BootScene.h src/Game/BootScene.cpp
+    src/Game/TitleScene.h src/Game/TitleScene.cpp
+    src/Game/SceneManager.h src/Game/SceneManager.cpp
+    src/Game/PlayerController.h src/Game/PlayerController.cpp
+    src/Game/PlayerStateMachine.h src/Game/PlayerStateMachine.cpp
+    src/Game/GemstoneSonicController.h src/Game/GemstoneSonicController.cpp
+    src/Game/PlayerCollisionController.h src/Game/PlayerCollisionController.cpp
+    src/Game/PlayerMovementSystem.h src/Game/PlayerMovementSystem.cpp
+    src/Game/StageWorld.h src/Game/StageWorld.cpp
+    src/Game/ObjectData.h src/Game/ObjectData.cpp
+    src/ResourceManager/RomLoader.h src/ResourceManager/RomLoader.cpp
+    src/ResourceManager/RomBuildDetector.h src/ResourceManager/RomBuildDetector.cpp
+    src/ResourceManager/RomBuildAdapter.h src/ResourceManager/RomBuildAdapter.cpp
+    src/ResourceManager/RomExtractor.h src/ResourceManager/RomExtractor.cpp
+    src/ResourceManager/RomAssetCatalog.h src/ResourceManager/RomAssetCatalog.cpp
+    src/ResourceManager/AssetManifest.h src/ResourceManager/AssetManifest.cpp
+    src/ResourceManager/LevelAssetLoader.h src/ResourceManager/LevelAssetLoader.cpp
+    src/ResourceManager/StageDataParser.h src/ResourceManager/StageDataParser.cpp
+    src/ResourceManager/LevelDataIntegration.h src/ResourceManager/LevelDataIntegration.cpp
+    src/ResourceManager/AddOnRomManager.h src/ResourceManager/AddOnRomManager.cpp
+    src/ResourceManager/PaletteManager.h src/ResourceManager/PaletteManager.cpp
+    src/ResourceManager/ResourceManager.h src/ResourceManager/ResourceManager.cpp
+    src/Physics/PhysicsBody.h src/Physics/PhysicsBody.cpp
+    src/Physics/GroundPhysics.h src/Physics/GroundPhysics.cpp
+    src/Physics/AirPhysics.h src/Physics/AirPhysics.cpp
+    src/Physics/PhysicsWorld.h src/Physics/PhysicsWorld.cpp
+    src/Physics/JumpPhysics.h src/Physics/JumpPhysics.cpp
+    src/Physics/WaterPhysics.h src/Physics/WaterPhysics.cpp
+    src/Physics/SlopePhysics.h src/Physics/SlopePhysics.cpp
+    src/Physics/RollingPhysics.h src/Physics/RollingPhysics.cpp
+    src/Physics/SpindashPhysics.h src/Physics/SpindashPhysics.cpp
+    src/Collision/Sensor.h src/Collision/Sensor.cpp
+    src/Collision/FloorSensor.h src/Collision/FloorSensor.cpp
+    src/Collision/CeilingSensor.h src/Collision/CeilingSensor.cpp
+    src/Collision/WallSensor.h src/Collision/WallSensor.cpp
+    src/Collision/SensorManager.h src/Collision/SensorManager.cpp
+    src/Collision/CollisionResolver.h src/Collision/CollisionResolver.cpp
+    src/Mod/ModLoader.h src/Mod/ModLoader.cpp
 )

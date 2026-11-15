@@ -1,191 +1,86 @@
 # Sonic CD: Little Planet Revisited
 
-> **Note on Repository Name**: The repository is named "SonicCDL.P.R" but the project is officially called **"Sonic CD: Little Planet Revisited"** (note the double 'L' in "Little"). The repository name was created with a spelling error that couldn't be corrected after creation. (THIS SPELLING ERROR HAS ALREADY BEEN CORRECTED)
+A C++20 fan-engine project for experimenting with a 2D Sonic CD-style platform game. This repository contains engine code, not SEGA game data.
 
-A modern game engine inspired by the Oxygen Engine (Sonic 3 A.I.R.), written from scratch in C++20 using DirectX 12 and SDL3.
+> **Status:** prototype/under active development. Some systems have data models and APIs but are not yet connected to a complete playable game. In particular, ROM detection is not asset extraction, and the renderer's sprite/rectangle draw calls are currently placeholders.
 
-## Overview
+## Legal and asset policy
 
-This project aims to recreate the Sonic CD experience with a custom-built engine that:
+- No copyrighted SEGA ROMs, game assets, videos, music, or extracted data are included.
+- Users are responsible for supplying files they are legally entitled to use and for complying with applicable law and platform terms.
+- The optional add-on ROM registry only inspects a small cartridge-header region to identify supported titles. It does not extract, copy, or redistribute their contents.
+- Add-on ROM registration is not yet a stage importer. Title assets, levels, sprites, and character behavior are not automatically imported from another game's ROM.
 
-- **Does NOT contain or distribute copyrighted SEGA assets**
-- Requires users to provide their own Sonic CD ROM/disk image
-- Extracts and utilizes resources during runtime
-- Provides a modern, modular, and extensible codebase
+## Current implementation snapshot
 
-## Technology Stack
+The repository currently has code for:
 
-- **Language**: C++20
-- **Graphics**: DirectX 12 Ultimate
-- **Window/Input**: SDL3
-- **Audio**: SDL3_mixer, libogg, libvorbis
-- **Compression**: zlib
-- **Build System**: CMake
-- **IDE**: Visual Studio 2022
-- **Platform**: Windows 10/11
+- C++20 / CMake project structure, SDL3 window setup, and a Windows Direct3D 12 renderer scaffold.
+- Camera and sprite data structures.
+- Player movement, physics, collision, stage-data, object, ring/enemy, and mod-related prototypes.
+- ROM/build detection and asset/level pipeline prototypes.
+- Optional add-on ROM identification for Sonic 2, Sonic 3 & Knuckles, and Sonic 3D Blast.
 
-## Project Architecture
+These are not all production-ready or integrated. In particular:
 
-```
-SonicCDL.P.R/
-├── src/
-│   ├── Core/              # Core engine systems
-│   ├── Renderer/          # DirectX 12 rendering
-│   ├── Audio/             # Audio management
-│   ├── Input/             # Input handling (SDL3)
-│   ├── ResourceManager/   # Asset loading and caching
-│   ├── Game/              # Game logic
-│   ├── Physics/           # Physics simulation
-│   ├── Animation/         # Animation system
-│   ├── Collision/         # Collision detection
-│   ├── Scene/             # Scene management
-│   ├── UI/                # UI systems
-│   ├── SaveData/          # Save state management
-│   ├── ModLoader/         # Mod system
-│   └── Tools/             # Development tools
-├── include/               # Public headers
-├── CMakeLists.txt         # Build configuration
-├── CMakePresets.json      # Build presets
-└── Mods/                  # Mod directory structure
-```
+- `Sprite` is currently a geometry/color descriptor; it has no texture/atlas, animation, or sprite-sheet playback system.
+- `Renderer::DrawSprite` and `Renderer::DrawRectangle` are placeholders. A functional sprite renderer still needs GPU resources, shaders/pipelines, texture upload, batching, and draw submission.
+- ROM signature scanning is heuristic and is not a verified decoder for Sonic CD or other games' asset formats.
+- Add-on recognition can use ROM header text and/or a filename hint; verify the detected title yourself. It does not prove a specific regional/revision dump.
+- Tails/Knuckles playable-character support and Sonic 2 spin-dash behavior are not implemented by registering an add-on ROM alone.
+- Sonic 3D Blast stages would require a separately designed 2D conversion/import pipeline; this project does not convert them yet.
 
-## Current Status
+## Optional add-on ROM registry
 
-- [x] Project structure and CMake setup
-- [x] SDL3 window initialization
-- [x] DirectX 12 initialization
-- [ ] Sprite Renderer
-- [ ] Physics Engine
-- [ ] Audio System
-- [ ] Collision Detection
-- [ ] Resource Manager
-- [ ] Level System
-- [ ] Mod Loader
-- [ ] Development Tools
+The `AddOnRomManager` accepts a user-selected cartridge image and can report a recognized title and intended reference capabilities:
 
-## Building
+| Add-on source | Intended reference use | Current status |
+| --- | --- | --- |
+| Sonic 3 & Knuckles | Knuckles and stage-design reference | Header/title recognition only; no character or stage import |
+| Sonic 2 | Tails and spin-dash reference | Header/title recognition only; no character or move import |
+| Sonic 3D Blast | Stage-design reference for a 2D reinterpretation | Header/title recognition only; no stage conversion |
 
-### Prerequisites
+Use the API from `ResourceManager/AddOnRomManager.h`. Registration stores the selected file path and metadata, not a copy of the ROM. The supported image header check expects a readable Mega Drive/Genesis-style header; interleaved SMD images are not decoded.
 
-- Visual Studio 2022 (C++20 support)
-- CMake 3.25+
-- Git
+## Build
 
-### Build Instructions
+### Requirements
 
-```bash
-# Clone the repository
+- CMake 3.25 or newer
+- C++20 compiler
+- SDL3 CMake package
+- GLM CMake package
+- nlohmann_json CMake package
+- Windows for the current Direct3D 12 renderer scaffold
+
+```sh
 git clone https://github.com/mario8192-march8182-A/SonicCDL.P.R.git
 cd SonicCDL.P.R
-
-# Create build directory
-mkdir build
-cd build
-
-# Configure with CMake
-cmake .. -G "Visual Studio 17 2022"
-
-# Build
-cmake --build . --config Release
+cmake -S . -B build -G "Visual Studio 17 2022"
+cmake --build build --config Release
 ```
 
-## Development Philosophy
+## Project layout
 
-- **Modular Design**: Each system is independent and loosely coupled
-- **Clean Code**: Uses modern C++ practices (smart pointers, RAII, constexpr)
-- **No Code Duplication**: DRY principle throughout
-- **Clear Documentation**: Every module is well-commented and explained
-- **Iterative Development**: Systems are implemented one at a time with thorough explanation
+```text
+src/
+├── Core/              # Engine and platform setup
+├── Renderer/          # Renderer, camera, textures, sprite descriptor
+├── Game/              # Player, scenes, stage world, gameplay prototypes
+├── ResourceManager/   # ROM/asset pipeline and add-on ROM registry
+├── Physics/           # Movement physics
+├── Collision/         # Collision sensors and resolution
+└── Mod/               # Mod metadata/loading prototype
+```
 
-## Running
+## Planned work
 
-The engine requires a valid Sonic CD ROM image to be provided by the user at startup. It will extract necessary resources and cache them for runtime use.
-
-## Features (Planned)
-
-### Rendering
-- Sprite Renderer
-- Camera System
-- Texture & Shader Management
-- Render Targets
-- Sprite Atlases
-- Tilemap Rendering
-- Parallax Scrolling
-- Fullscreen Effects
-- Widescreen Support
-- Modern Resolution Support
-
-### Physics
-- Sonic CD Physics Behavior
-- Ground Physics
-- Air Physics
-- Slope Physics
-- Rolling & Spindash
-- Jumping
-- Springs
-- Water Mechanics
-- Conveyor Belts
-- Moving Platforms
-
-### Collision
-- Height Masks
-- Angle Maps
-- Sensor System
-- Floor/Wall/Ceiling Detection
-
-### Audio
-- Music Playback
-- Sound Effects
-- Per-Source Volume Control
-- Crossfading
-- Looping
-- Streaming
-
-### Modern Features
-- 60/120/144 FPS / Unlocked FPS
-- Save States
-- Auto-save
-- Debug Menu
-- Photo Mode
-- Speedrun Timer
-- Replay System
-
-### Modding
-- Custom Sprites
-- Custom Music
-- Lua Scripting
-- Custom Levels
-- Resource Override System
-
-## Code Standards
-
-- Modern C++ (C++20)
-- `std::unique_ptr` and `std::shared_ptr` for memory management
-- RAII (Resource Acquisition Is Initialization)
-- `constexpr` where applicable
-- `enum class` for type safety
-- Namespaces for organization
-- Clear, descriptive comments
-- DRY (Don't Repeat Yourself) principle
-
-## Legal Notice
-
-This project is a fan-made engine and does **NOT include any copyrighted SEGA assets**. Users must provide their own Sonic CD ROM/disk image for the engine to function. This engine is for educational and personal use only.
+- Implement a real textured sprite renderer, sprite sheets, and animation playback.
+- Replace heuristic ROM scanning with documented, format-specific parsers and validation.
+- Add stage/object import formats that use user-provided, legally obtained data.
+- Connect the stage world, player interactions, camera, HUD, and scene flow into a playable loop.
+- Implement opt-in, independently authored playable-character and 2D stage-conversion systems.
 
 ## Contributing
 
-Contributions are welcome! Please ensure:
-- Code follows the standards listed above
-- Each module remains independent
-- New features include documentation
-- Commits have clear, descriptive messages
-
-## License
-
-[To be determined - consider MIT, Apache 2.0, or GPL]
-
-## Acknowledgments
-
-- Inspired by the Oxygen Engine (Sonic 3 A.I.R.)
-- Built with DirectX 12, SDL3, and modern C++ practices
-- Community feedback and contributions
+Keep engine code separate from copyrighted game data. Clearly label prototypes and avoid claiming that a format is supported until it has been tested against known-good, legally obtained samples.
