@@ -1,86 +1,51 @@
 #include "ResourceManager/RomLoader.h"
 
+#include <algorithm>
+#include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
-#include <algorithm>
-#include <filesystem>
-#include <cstring>
 
 namespace fs = std::filesystem;
 
 namespace sclpr::resource {
 
 RomLoader::RomLoader() = default;
-
 RomLoader::~RomLoader() = default;
+
+namespace {
+std::string ToLower(std::string input) {
+    std::transform(input.begin(), input.end(), input.begin(),
+                   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+    return input;
+}
+
+bool HasSignature(const std::string& text, const std::string& needle) {
+    const std::string lowerText = ToLower(text);
+    const std::string lowerNeedle = ToLower(needle);
+    return lowerText.find(lowerNeedle) != std::string::npos;
+}
+} // namespace
 
 std::vector<RomMetadata> RomLoader::DetectRoms() {
     std::vector<RomMetadata> detectedRoms;
 
-    // Standard ROM file extensions
-    const std::vector<std::string> extensions = {
-        ".bin", ".iso", ".cue", ".img", ".ccd",
-        ".md", ".gen", ".smd"
-    };
-
-    // Search in current directory
+    const std::vector<std::string> extensions = {".bin", ".iso", ".cue", ".img", ".ccd", ".md", ".gen", ".smd"};
     try {
         for (const auto& entry : fs::directory_iterator(fs::current_path())) {
             if (!entry.is_regular_file()) continue;
 
-            std::string ext = entry.path().extension().string();
-            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+            const std::string ext = entry.path().extension().string();
+            if (std::find(extensions.begin(), extensions.end(), ToLower(ext)) == extensions.end()) {
+                continue;
+            }
 
-            // Check if file has a ROM extension
-            if (std::find(extensions.begin(), extensions.end(), ext) != extensions.end()) {
-                RomMetadata metadata;
-                if (ValidateRom(entry.path().string(), metadata)) {
-                    detectedRoms.push_back(metadata);
-                }
+            RomMetadata metadata;
+            if (ValidateRom(entry.path().string(), metadata)) {
+                detectedRoms.push_back(metadata);
             }
         }
-    } catch (const std::exception& e) {
-        // Silently continue if directory scan fails
-    }
-
-    // Also check common ROM directories
-    std::vector<std::string> commonDirs = {
-        "ROMs",
-        "Games",
-        "Sonic CD",
-        "SonicCD"
-    };
-
-    for (const auto& dir : commonDirs) {
-        if (!fs::exists(dir)) continue;
-        try {
-            for (const auto& entry : fs::directory_iterator(dir)) {
-                if (!entry.is_regular_file()) continue;
-
-                std::string ext = entry.path().extension().string();
-                std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-
-                if (std::find(extensions.begin(), extensions.end(), ext) != extensions.end()) {
-                    RomMetadata metadata;
-                    if (ValidateRom(entry.path().string(), metadata)) {
-                        // Avoid duplicates
-                        bool isDuplicate = false;
-                        for (const auto& detected : detectedRoms) {
-                            if (detected.fileSize == metadata.fileSize &&
-                                detected.displayName == metadata.displayName) {
-                                isDuplicate = true;
-                                break;
-                            }
-                        }
-                        if (!isDuplicate) {
-                            detectedRoms.push_back(metadata);
-                        }
-                    }
-                }
-            }
-        } catch (const std::exception& e) {
-            // Silently continue
-        }
+    } catch (...) {
     }
 
     return detectedRoms;
@@ -88,33 +53,30 @@ std::vector<RomMetadata> RomLoader::DetectRoms() {
 
 bool RomLoader::LoadRom(const std::string& filePath) {
     RomMetadata metadata;
-
     if (!ValidateRom(filePath, metadata)) {
         return false;
     }
 
-    // Read the ROM file into memory
     std::ifstream romFile(filePath, std::ios::binary);
     if (!romFile.is_open()) {
         return false;
     }
 
-    // Get file size
     romFile.seekg(0, std::ios::end);
-    size_t fileSize = romFile.tellg();
+    const std::streamoff size = romFile.tellg();
     romFile.seekg(0, std::ios::beg);
 
-    // Read entire file
-    m_romData.resize(fileSize);
-    romFile.read(reinterpret_cast<char*>(m_romData.data()), fileSize);
+    if (size <= 0) {
+        return false;
+    }
+
+    m_romData.resize(static_cast<size_t>(size));
+    romFile.read(reinterpret_cast<char*>(m_romData.data()), static_cast<std::streamsize>(m_romData.size()));
     romFile.close();
 
     m_currentRom = metadata;
     m_romLoaded = true;
-
-    // Build resource offset map (simplified for now)
-    // Full implementation would parse the actual ROM structure
-    m_resourceOffsets.clear();
+    BuildKnownResourceIndex();
 
     return true;
 }
@@ -125,61 +87,46 @@ bool RomLoader::ValidateRom(const std::string& filePath, RomMetadata& outMetadat
         return false;
     }
 
-    // Check file size
     romFile.seekg(0, std::ios::end);
-    size_t fileSize = romFile.tellg();
+    const std::streamoff size = romFile.tellg();
     romFile.seekg(0, std::ios::beg);
 
-    // Sonic CD ROM is typically 512 KB or larger
-    if (fileSize < 512 * 1024) {
+    if (size < 512 * 1024) {
         return false;
     }
 
-    // Read header (first 256 bytes)
-    std::vector<uint8_t> header(256);
+    std::vector<uint8_t> header(256, 0);
     romFile.read(reinterpret_cast<char*>(header.data()), 256);
     romFile.close();
 
-    // Validate using ROM header
     if (!ParseRomHeader(header, outMetadata)) {
         return false;
     }
 
     outMetadata.filename = filePath;
-    outMetadata.fileSize = fileSize;
+    outMetadata.fileSize = static_cast<size_t>(size);
     outMetadata.isValid = true;
-
     return true;
 }
 
 bool RomLoader::ParseRomHeader(const std::vector<uint8_t>& headerData, RomMetadata& outMetadata) {
-    // Sonic CD ROM header validation
-    // Offset 0x100-0x10F: System type (should be "SEGA" for Genesis/Mega Drive)
-    // Offset 0x120-0x14F: Copyright/Title info
-
     if (headerData.size() < 256) {
         return false;
     }
 
-    // Check for Sonic CD signature in header
-    // "Sonic" typically appears in the ROM header
-    std::string headerStr(reinterpret_cast<const char*>(headerData.data()), headerData.size());
+    const std::string headerStr(reinterpret_cast<const char*>(headerData.data()), headerData.size());
 
-    bool hasSonicSignature = (headerStr.find("Sonic CD") != std::string::npos ||
-                             headerStr.find("SONIC CD") != std::string::npos ||
-                             headerStr.find("sonic cd") != std::string::npos);
+    const bool hasSonicCD = HasSignature(headerStr, "Sonic CD") ||
+                           HasSignature(headerStr, "SONIC CD") ||
+                           HasSignature(headerStr, "sonic cd");
+    const bool hasSega = HasSignature(headerStr, "SEGA");
 
-    // Also check for general Sega Genesis/Mega Drive signature
-    bool hasSegaSignature = (headerStr.find("SEGA") != std::string::npos);
-
-    if (!hasSonicSignature && !hasSegaSignature) {
+    if (!hasSonicCD && !hasSega) {
         return false;
     }
 
-    // Determine region from header
-    // Typically at offset 0xF0 in Genesis ROM
     if (headerData.size() > 0xF0) {
-        uint8_t regionCode = headerData[0xF0];
+        const uint8_t regionCode = headerData[0xF0];
         if (regionCode == 'J') {
             outMetadata.region = "JP";
             outMetadata.displayName = "Sonic CD (Japan)";
@@ -199,6 +146,38 @@ bool RomLoader::ParseRomHeader(const std::vector<uint8_t>& headerData, RomMetada
     return true;
 }
 
+void RomLoader::BuildKnownResourceIndex() {
+    m_knownResources.clear();
+    m_resourceOffsets.clear();
+
+    if (m_romData.empty()) {
+        return;
+    }
+
+    const std::vector<std::pair<std::string, std::string>> knownNames = {
+        {"title", "text"},
+        {"header", "header"},
+        {"palette", "palette"},
+        {"tilemap", "tilemap"},
+        {"music", "audio"},
+        {"sprite", "sprite"},
+    };
+
+    for (const auto& [name, type] : knownNames) {
+        const std::string lowerRom(reinterpret_cast<const char*>(m_romData.data()),
+                                    std::min<std::size_t>(m_romData.size(), 4096));
+        const std::string lowerText = ToLower(lowerRom);
+
+        const std::string needle = ToLower(name);
+        const std::string::size_type pos = lowerText.find(needle);
+
+        if (pos != std::string::npos) {
+            m_resourceOffsets[name] = pos;
+            m_knownResources.push_back({name, type, pos, std::min<std::size_t>(256, m_romData.size() - pos)});
+        }
+    }
+}
+
 const RomMetadata* RomLoader::GetLoadedRomMetadata() const noexcept {
     return m_romLoaded ? &m_currentRom : nullptr;
 }
@@ -212,18 +191,19 @@ std::vector<uint8_t> RomLoader::ExtractResource(const std::string& resourceName)
         return {};
     }
 
-    auto it = m_resourceOffsets.find(resourceName);
+    const auto it = m_resourceOffsets.find(resourceName);
     if (it == m_resourceOffsets.end()) {
         return {};
     }
 
-    // Simplified extraction - full implementation would parse specific ROM structures
-    size_t offset = it->second;
+    const size_t offset = it->second;
     if (offset >= m_romData.size()) {
         return {};
     }
 
-    return m_romData;
+    const size_t length = std::min<size_t>(256, m_romData.size() - offset);
+    return std::vector<uint8_t>(m_romData.begin() + static_cast<std::ptrdiff_t>(offset),
+                                m_romData.begin() + static_cast<std::ptrdiff_t>(offset + length));
 }
 
 std::vector<std::string> RomLoader::GetAvailableResources() const {
@@ -232,6 +212,10 @@ std::vector<std::string> RomLoader::GetAvailableResources() const {
         resources.push_back(pair.first);
     }
     return resources;
+}
+
+std::vector<RomResource> RomLoader::GetKnownResources() const noexcept {
+    return m_knownResources;
 }
 
 } // namespace sclpr::resource
